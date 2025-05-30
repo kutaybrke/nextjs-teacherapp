@@ -1,17 +1,18 @@
 import Link from "next/link";
 import React from "react";
+import MenuSheet from "./_components/MenuSheet";
 
 const Header = () => {
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
+    <header className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white py-8  shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         {/* Logo veya Site Adı */}
-        <Link href="/" className="text-xl font-bold text-blue-600">
+        <Link href="/" className="text-xl font-bold ">
           İlayde Yücer | Biyolog | Biyoloji Öğretmeni
         </Link>
 
         {/* Menü Linkleri */}
-        <nav className="flex space-x-6 text-sm font-medium text-gray-700">
+        <nav className="hidden md:flex space-x-6  font-bold  ">
           <Link
             href="/"
             className="hover:text-blue-600 transition-colors duration-200"
@@ -25,7 +26,7 @@ const Header = () => {
             Dersler & Hizmetler
           </Link>
           <Link
-            href="/musaitlik"
+            href="/availability"
             className="hover:text-blue-600 transition-colors duration-200"
           >
             Müsaitlik
@@ -36,7 +37,14 @@ const Header = () => {
           >
             Blog
           </Link>
+          <Link
+            href="/aboutme"
+            className="hover:text-blue-600 transition-colors duration-200"
+          >
+            Hakkımda
+          </Link>
         </nav>
+        <MenuSheet />
       </div>
     </header>
   );

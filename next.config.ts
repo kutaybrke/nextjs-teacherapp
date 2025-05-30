@@ -1,7 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    domains: [
+      "images.pexels.com"
+    ],
+
+  },
+  env: {
+    ADMIN_USERNAME: process.env.ADMIN_USERNAME,
+    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
+  },
+  experimental: {
+    serverComponentsExternalPackages: [],
+  }
 };
 
 export default nextConfig;

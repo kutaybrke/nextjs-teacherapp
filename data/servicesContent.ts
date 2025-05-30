@@ -38,7 +38,7 @@ export const servicesContent = {
       id: 1,
       title: "Saatlik Ders Paketi",
       description: "Fen-Biyoloji dersi için birebir özel ders.",
-      duration: "1 Saat (40 dakika ders + 5-10 dakika mola)",
+      duration: "40 dakika ders",
       price: "500₺",
       includes: ["Fen", "Biyoloji"],
     },

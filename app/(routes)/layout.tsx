@@ -10,7 +10,7 @@ const Layout = ({ children }: RouteLayoutProps) => {
   return (
     <div>
       <Header />
-      <main className="min-h-screen mx-auto">{children}</main>
+      <main className="min-h-screen ">{children}</main>
       <Footer />
     </div>
   );
