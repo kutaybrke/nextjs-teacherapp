@@ -1,8 +1,9 @@
 import React from 'react'
+import CalendarComponent from './_components/Calendar'
 
 const MyAvailabilityPage = () => {
     return (
-        <div>MyAvailabilityPage</div>
+        <div><CalendarComponent /></div>
     )
 }
 

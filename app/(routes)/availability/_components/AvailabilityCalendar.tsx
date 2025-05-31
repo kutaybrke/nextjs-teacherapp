@@ -9,7 +9,7 @@ import {
     getDay,
 } from "date-fns";
 import { tr } from "date-fns/locale";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -21,22 +21,38 @@ type Event = {
     date: string;
 };
 
-const sampleEvents: Event[] = [
-    { title: "Toplantı", time: "10:00 - 11:00", date: "2025-05-30" },
-    { title: "Ders Ziyareti", time: "14:00 - 15:00", date: "2025-05-31" },
-];
-
 export default function CalendarMonthView() {
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [events, setEvents] = useState<Event[]>([]);
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const res = await fetch("/api/event");
+                const data = await res.json();
+
+                const formattedEvents: Event[] = data.map((item: any) => ({
+                    title: "Dolu", // Varsayılan başlık (dilerseniz backend'e ekleyebilirsiniz)
+                    time: `${item.startTime} - ${item.endTime}`,
+                    date: format(new Date(item.date), "yyyy-MM-dd"),
+                }));
+
+                setEvents(formattedEvents);
+            } catch (error) {
+                console.error("Etkinlikler alınırken hata oluştu:", error);
+            }
+        };
+
+        fetchEvents();
+    }, []);
 
     const start = startOfMonth(currentDate);
     const end = endOfMonth(currentDate);
-
     const days = eachDayOfInterval({ start, end });
     const firstWeekDay = getDay(start) || 7;
     const paddingDays = Array.from({ length: firstWeekDay - 1 });
 
-    const eventsByDate = sampleEvents.reduce((acc, event) => {
+    const eventsByDate = events.reduce((acc, event) => {
         if (!acc[event.date]) acc[event.date] = [];
         acc[event.date].push(event);
         return acc;
@@ -81,7 +97,7 @@ export default function CalendarMonthView() {
 
             {/* Takvim Grid */}
             <motion.div
-                className="grid grid-cols-7 "
+                className="grid grid-cols-7"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
@@ -122,10 +138,10 @@ export default function CalendarMonthView() {
                     );
                 })}
             </motion.div>
+
             <div className="mt-2 text-3xl text-left">
                 <p>Bu takvimde mevcut aylık programımı görebilirsiniz. Uygun olduğum zaman dilimlerinde özel dersler verebilirim.</p>
             </div>
-
         </div>
     );
 }

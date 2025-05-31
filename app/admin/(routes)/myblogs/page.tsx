@@ -1,8 +1,11 @@
 import React from 'react'
+import MyBlogsComponent from './_components/MyBlogs'
 
 const MyBlogsPage = () => {
     return (
-        <div>MyBlogsPage</div>
+        <div>
+            <MyBlogsComponent />
+        </div>
     )
 }
 

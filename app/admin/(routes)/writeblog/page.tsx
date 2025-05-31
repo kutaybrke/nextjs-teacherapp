@@ -25,32 +25,54 @@ const WriteBlogPage = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const form = new FormData();
-        form.append("title", formData.title);
-        form.append("summary", formData.summary);
-        form.append("content", formData.content);
-        form.append("date", date?.toISOString() || "");
-        if (image) {
-            form.append("image", image);
-        }
+        let imageUrl = "";
 
         try {
-            const response = await fetch("/api/blogs", {
+            if (image) {
+                // 1. Resmi backend API'ye yükle
+                const uploadData = new FormData();
+                uploadData.append("image", image);
+
+                const uploadResponse = await fetch("/api/upload", {
+                    method: "POST",
+                    body: uploadData,
+                });
+
+                if (!uploadResponse.ok) {
+                    throw new Error("Resim yükleme başarısız");
+                }
+
+                const uploadResult = await uploadResponse.json();
+                imageUrl = uploadResult.secure_url; // Cloudinary'den dönen resim URL'si
+            }
+
+            // 2. Blog verisini backend'e gönder
+            const form = new FormData();
+            form.append("title", formData.title);
+            form.append("summary", formData.summary);
+            form.append("content", formData.content);
+            form.append("date", date?.toISOString() || "");
+            form.append("imageUrl", imageUrl);
+
+            const response = await fetch("/api/writeblog", {
                 method: "POST",
                 body: form,
             });
 
             if (response.ok) {
                 alert("Blog başarıyla gönderildi!");
-                // Gerekirse yönlendirme: router.push('/admin/myblogs');
+                setFormData({ title: "", summary: "", content: "", })
+                setImage(null);
+                setDate(new Date());
             } else {
                 alert("Bir hata oluştu.");
             }
         } catch (error) {
             console.error("Hata:", error);
-            alert("Sunucu hatası!");
+            alert("Sunucu hatası veya yükleme başarısız!");
         }
     };
+
 
     return (
         <form

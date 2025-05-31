@@ -1,50 +1,53 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const method = req.method;
+export async function GET() {
+    try {
+        const posts = await prisma.blogPost.findMany({
+            orderBy: { date: "desc" },
+        });
+        return NextResponse.json(posts);
+    } catch (error) {
+        return NextResponse.json(
+            { error: "Database error" },
+            { status: 500 }
+        );
+    }
+}
 
-    switch (method) {
-        case 'GET':
-            try {
-                const posts = await prisma.blogPost.findMany({
-                    orderBy: { date: 'desc' },
-                });
-                res.status(200).json(posts);
-            } catch (error) {
-                res.status(500).json({ error: 'Database error' });
-            }
-            break;
+export async function POST(req: Request) {
+    try {
+        const body = await req.json();
+        const { title, summary, content, date, imageUrl, author } = body;
 
-        case 'POST':
-            try {
-                const { title, summary, content, date, imageUrl, author } = req.body;
+        if (!title || !summary || !content || !date || !author) {
+            return NextResponse.json(
+                { error: "Missing required fields" },
+                { status: 400 }
+            );
+        }
 
-                if (!title || !summary || !content || !date || !author) {
-                    return res.status(400).json({ error: 'Missing required fields' });
-                }
+        const newPost = await prisma.blogPost.create({
+            data: {
+                title,
+                summary,
+                content,
+                date: new Date(date),
+                imageUrl: imageUrl || null,
+                author,
+            },
+        });
 
-                const newPost = await prisma.blogPost.create({
-                    data: {
-                        title,
-                        summary,
-                        content,
-                        date: new Date(date),
-                        imageUrl: imageUrl || null,
-                        author,
-                    },
-                });
-
-                res.status(201).json({ message: 'Blog post created', post: newPost });
-            } catch (error) {
-                res.status(500).json({ error: 'Database error' });
-            }
-            break;
-
-        default:
-            res.setHeader('Allow', ['GET', 'POST']);
-            res.status(405).end(`Method ${method} Not Allowed`);
+        return NextResponse.json(
+            { message: "Blog post created", post: newPost },
+            { status: 201 }
+        );
+    } catch (error) {
+        return NextResponse.json(
+            { error: "Database error" },
+            { status: 500 }
+        );
     }
 }
